@@ -1,4 +1,4 @@
-package com.example.android.bluetoothchat;
+//package com.example.android.bluetoothchat;
 ///*
 // * Copyright (C) 2009 The Android Open Source Project
 // *

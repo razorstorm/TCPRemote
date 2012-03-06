@@ -21,4 +21,8 @@ public class SavedConnection
 		return name;
 	}
 
+	public String toString()
+	{
+		return name+" => " +ip;
+	}
 }

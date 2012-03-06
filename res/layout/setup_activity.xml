@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+	android:layout_width="fill_parent" android:layout_height="fill_parent"
+	android:padding="10px" android:background="@drawable/bg">
+
+
+	<EditText android:id="@+id/editText2" android:layout_width="0dp"
+		android:layout_weight="1" android:layout_height="wrap_content">
+		<requestFocus></requestFocus>
+	</EditText>
+	<Button android:id="@+id/use_a_saved_connection_button"
+		android:text="@string/saved_connections_button_label"
+		android:layout_height="wrap_content" android:layout_width="fill_parent"
+		android:layout_alignParentTop="true" android:layout_alignParentRight="true"
+		android:layout_marginTop="89dp"></Button>
+
+	<TextView android:id="@+id/textView3" android:text="@string/or"
+		android:layout_height="wrap_content" android:textAppearance="?android:attr/textAppearanceLarge"
+		android:layout_width="wrap_content" android:layout_below="@+id/use_a_saved_connection_button"
+		android:layout_centerHorizontal="true" android:layout_marginTop="60dp"></TextView>
+
+
+
+
+
+
+
+	<TextView android:id="@+id/textView1" android:text="@string/server_name_label"
+		android:layout_height="wrap_content" android:layout_width="fill_parent"
+		android:layout_above="@+id/new_connection_name_text_view"
+		android:layout_alignParentRight="true" android:layout_alignParentLeft="true"></TextView>
+
+	<EditText android:layout_height="wrap_content"
+		android:layout_width="318dp" android:layout_above="@+id/textView2"
+		android:layout_alignParentLeft="true" android:layout_alignRight="@+id/textView1"
+		android:id="@+id/new_connection_name_text_view"></EditText>
+
+	<TextView android:id="@+id/textView2" android:text="@string/server_ip_label"
+		android:layout_height="wrap_content" android:layout_width="wrap_content"
+		android:layout_above="@+id/new_connection_ip_text_view"
+		android:layout_alignParentLeft="true" android:layout_alignParentRight="true"></TextView>
+	<EditText android:layout_height="wrap_content"
+		android:layout_width="318dp" android:id="@+id/new_connection_ip_text_view"
+		android:layout_above="@+id/make_new_connection_button"
+		android:layout_alignLeft="@+id/make_new_connection_button"
+		android:layout_alignRight="@+id/make_new_connection_button"></EditText>
+
+
+
+	<Button android:id="@+id/make_new_connection_button"
+		android:text="@string/connect_button_label" android:layout_height="wrap_content"
+		android:layout_alignParentBottom="true" android:layout_width="match_parent"
+		android:layout_alignParentRight="true"></Button>
+
+</RelativeLayout>

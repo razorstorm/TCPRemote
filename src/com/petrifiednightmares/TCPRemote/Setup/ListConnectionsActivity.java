@@ -19,15 +19,17 @@ package com.petrifiednightmares.TCPRemote.Setup;
 import java.util.ArrayList;
 
 import android.app.Activity;
+import android.app.AlertDialog;
+import android.app.AlertDialog.Builder;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
-import android.view.View.OnClickListener;
 import android.view.Window;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
+import android.widget.AdapterView.OnItemLongClickListener;
 import android.widget.ArrayAdapter;
-import android.widget.Button;
 import android.widget.ListView;
 import android.widget.TextView;
 
@@ -36,17 +38,11 @@ import com.petrifiednightmares.TCPRemote.SavedConnections.SavedConnection;
 import com.petrifiednightmares.TCPRemote.SavedConnections.SavedConnectionsHelper;
 
 /**
- * This Activity appears as a dialog. It lists any paired devices and devices
- * detected in the area after discovery. When a device is chosen by the user,
- * the MAC address of the device is sent back to the parent Activity in the
- * result Intent.
+ * This Activity appears as a dialog. It lists any paired devices and devices detected in the area after discovery. When a device is chosen by the user, the MAC address of the
+ * device is sent back to the parent Activity in the result Intent.
  */
 public class ListConnectionsActivity extends Activity
 {
-	// Debugging
-	private static final String TAG = "DeviceListActivity";
-	private static final boolean D = true;
-
 	// Return Intent extra
 	public static String EXTRA_IP_ADDRESS = "ip_address";
 
@@ -54,7 +50,10 @@ public class ListConnectionsActivity extends Activity
 	private ArrayAdapter<String> savedConnectionsArrayAdapter;
 
 	private ArrayList<SavedConnection> savedConnections;
-	
+
+	private SavedConnectionsHelper savedConnectionsHelper;
+	private Builder deleteConfirmationDialog;
+
 	@Override
 	protected void onCreate(Bundle savedInstanceState)
 	{
@@ -67,48 +66,42 @@ public class ListConnectionsActivity extends Activity
 		// Set result CANCELED in case the user backs out
 		setResult(Activity.RESULT_CANCELED);
 
-		// Initialize the button to perform device discovery
-		Button scanButton = (Button) findViewById(R.id.button_scan);
-		scanButton.setOnClickListener(new OnClickListener()
-		{
-			public void onClick(View v)
-			{
-				v.setVisibility(View.GONE);
-			}
-		});
-
 		// Initialize array adapters. One for already paired devices and
 		// one for newly discovered devices
-		savedConnectionsArrayAdapter = new ArrayAdapter<String>(this,
-				R.layout.list_connections);
+		savedConnectionsArrayAdapter = new ArrayAdapter<String>(this, R.layout.saved_connection);
 
 		ListView savedConnectionsListView = (ListView) findViewById(R.id.saved_ips);
-		
+
 		savedConnectionsListView.setAdapter(savedConnectionsArrayAdapter);
+		savedConnectionsListView.setOnItemLongClickListener(savedConnectionsLongClickListener);
 		savedConnectionsListView.setOnItemClickListener(savedConnectionsClickListener);
 
-
-
-		SavedConnectionsHelper savedConnectionsHelper = new SavedConnectionsHelper(this);
+		savedConnectionsHelper = new SavedConnectionsHelper(this);
 		savedConnections = savedConnectionsHelper.getSavedConnections();
-		
-		
+
 		// If there are paired devices, add each one to the ArrayAdapter
 		if (savedConnections.size() > 0)
 		{
-			findViewById(R.id.title_saved_connections).setVisibility(View.VISIBLE);
+			findViewById(R.id.saved_ips).setVisibility(View.VISIBLE);
 			for (SavedConnection connection : savedConnections)
 			{
-				savedConnectionsArrayAdapter.add(connection.getName() + "\n"
-						+ connection.getIp());
+				savedConnectionsArrayAdapter.add(connection.getName() + "\n" + connection.getIp());
 			}
 		}
 		else
 		{
-			String noDevices = getResources().getText(R.string.none_saved)
-					.toString();
+			String noDevices = getResources().getText(R.string.none_saved).toString();
 			savedConnectionsArrayAdapter.add(noDevices);
 		}
+
+		deleteConfirmationDialog = new AlertDialog.Builder(this).setTitle(R.string.delete_confirmation_title).setMessage(R.string.delete)
+				.setNegativeButton(R.string.no, new DialogInterface.OnClickListener()
+				{
+					public void onClick(DialogInterface dialog, int which)
+					{
+						// Do nothing
+					}
+				});
 	}
 
 	@Override
@@ -117,7 +110,35 @@ public class ListConnectionsActivity extends Activity
 		super.onDestroy();
 	}
 
+	private OnItemLongClickListener savedConnectionsLongClickListener = new OnItemLongClickListener()
+	{
 
+		
+		@Override
+		public boolean onItemLongClick(AdapterView<?> arg0, View v, final int position, long arg3)
+		{
+			String info = ((TextView) v).getText().toString();
+			String[] splitUpString = info.split("\n");
+			final String name = splitUpString[0];
+			final String ipAddress = splitUpString[1];
+
+			deleteConfirmationDialog.setPositiveButton(R.string.yes, new DialogInterface.OnClickListener()
+			{
+
+				@Override
+				public void onClick(DialogInterface dialog, int which)
+				{
+					//delete the item in db
+					savedConnectionsHelper.delete(name, ipAddress);
+					//delete the item from the list
+					savedConnectionsArrayAdapter.remove(savedConnectionsArrayAdapter.getItem(position));
+				}
+
+			}).show();
+
+			return true;
+		}
+	};
 	// The on-click listener for all devices in the ListViews
 	private OnItemClickListener savedConnectionsClickListener = new OnItemClickListener()
 	{
